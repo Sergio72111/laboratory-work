@@ -51,11 +51,12 @@ endif()
 install(TARGETS helloworld_cli RUNTIME DESTINATION bin)
 
 # Set CPack configuration for packaging
-set(CPACK_GENERATOR "DEB;PKG") # Ensure both DEB and PKG are specified
+set(CPACK_GENERATOR "DEB") # Specify only DEB if PKG is not needed
 
-set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}") # Use full project version
-
-set(CPACK_PACKAGE_CONTACT example@example.com)
+set(CPACK_PACKAGE_NAME "helloworld") # Set your package name
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.email@example.com>") # Set maintainer info
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "A simple hello world application") # Set description
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "") # Specify dependencies if any
 
 include(CPack)
 
