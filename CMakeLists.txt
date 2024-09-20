@@ -58,6 +58,11 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # Set CPack configuration for packaging on macOS only
     set(CPACK_GENERATOR "Bundle") # Use Bundle for macOS
 
+    # Required variables for Bundle generator
+    set(CPACK_BUNDLE_NAME "HelloWorld") # Set the name of the bundle
+    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist") # Path to your Info.plist file (create this file if it doesn't exist)
+    set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns") # Path to your icon file (create this file if it doesn't exist)
+
 endif()
 
 include(CPack)
