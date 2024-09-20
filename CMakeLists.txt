@@ -29,7 +29,7 @@ target_include_directories(helloworld PRIVATE "${CMAKE_BINARY_DIR}")
 # Set compile definitions and include directories for test_version
 set_target_properties(test_version PROPERTIES
     COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
-    INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS} # Use Boost_INCLUDE_DIRS instead of Boost_INCLUDE_DIR
+    INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
 )
 
 # Link libraries to executables
@@ -47,21 +47,20 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(test_version PRIVATE -Wall -Wextra -pedantic -Werror)
 
     # Set CPack configuration for packaging on Linux only
-    set(CPACK_GENERATOR "DEB") # Specify DEB only for Linux builds
-
-    set(CPACK_PACKAGE_NAME "helloworld") # Set your package name
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.email@example.com>") # Set maintainer info
-    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "A simple hello world application") # Set description
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "") # Specify dependencies if any
+    set(CPACK_GENERATOR "DEB")
+    set(CPACK_PACKAGE_NAME "helloworld")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.email@example.com>")
+    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "A simple hello world application")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
 
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # Set CPack configuration for packaging on macOS only
-    set(CPACK_GENERATOR "Bundle") # Use Bundle for macOS
-
+    set(CPACK_GENERATOR "Bundle")
+    
     # Required variables for Bundle generator
-    set(CPACK_BUNDLE_NAME "HelloWorld") # Set the name of the bundle
-    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist") # Path to your Info.plist file (create this file if it doesn't exist)
-    set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns") # Path to your icon file (create this file if it doesn't exist)
+    set(CPACK_BUNDLE_NAME "HelloWorld") 
+    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist") # Ensure this path is correct
+    set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns") # Optional icon file
 
 endif()
 
