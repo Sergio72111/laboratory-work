@@ -3,7 +3,7 @@ cmake_policy(SET CMP0167 NEW)
 cmake_minimum_required(VERSION 3.10)
 
 # Set project version
-set(PATCH_VERSION "17" CACHE INTERNAL "Patch version")
+set(PATCH_VERSION "18" CACHE INTERNAL "Patch version")
 set(PROJECT_VERSION 0.0.${PATCH_VERSION})
 
 project(helloworld VERSION ${PROJECT_VERSION})
