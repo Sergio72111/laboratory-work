@@ -33,11 +33,17 @@ if (MSVC)
     target_compile_options(helloworld_cli PRIVATE /W4)
     target_compile_options(helloworld PRIVATE /W4)
     target_compile_options(test_version PRIVATE /W4)
-else ()
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_options(helloworld_cli PRIVATE -Wall -Wextra -pedantic -Werror)
+    target_compile_options(helloworld PRIVATE -Wall -Wextra -pedantic -Werror)
+    target_compile_options(test_version PRIVATE -Wall -Wextra -pedantic -Werror)
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_compile_options(helloworld_cli PRIVATE -Wall -Wextra -pedantic -Werror)
     target_compile_options(helloworld PRIVATE -Wall -Wextra -pedantic -Werror)
     target_compile_options(test_version PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
+
+set(CMAKE_CXX_COMPILER "g++" CACHE INTERNAL "C++ compiler")
 
 install(TARGETS helloworld_cli RUNTIME DESTINATION bin)
 
