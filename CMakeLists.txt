@@ -1,7 +1,9 @@
+cmake_policy(SET CMP0167 NEW)
+
 cmake_minimum_required(VERSION 3.10)
 
 # Set project version
-set(PATCH_VERSION "1" CACHE INTERNAL "Patch version")
+set(PATCH_VERSION "16" CACHE INTERNAL "Patch version")
 set(PROJECT_VERSION 0.0.${PATCH_VERSION})
 
 project(helloworld VERSION ${PROJECT_VERSION})
@@ -59,7 +61,7 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     
     # Required variables for Bundle generator
     set(CPACK_BUNDLE_NAME "HelloWorld") 
-    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in") # Use .in file instead of .plist
+    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in")
     set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns") # Optional icon file
 
     # Configure Info.plist file
