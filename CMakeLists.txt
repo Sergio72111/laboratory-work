@@ -1,9 +1,7 @@
-cmake_policy(SET CMP0167 NEW)
-
 cmake_minimum_required(VERSION 3.10)
 
 # Set project version
-set(PATCH_VERSION "18" CACHE INTERNAL "Patch version")
+set(PATCH_VERSION "20" CACHE INTERNAL "Patch version")
 set(PROJECT_VERSION 0.0.${PATCH_VERSION})
 
 project(helloworld VERSION ${PROJECT_VERSION})
@@ -13,6 +11,9 @@ find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 # Configure version header file
 configure_file(version.h.in version.h)
+
+# Configure Info.plist from template
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${CMAKE_CURRENT_BINARY_DIR}/Info.plist @ONLY)
 
 # Define executables and libraries
 add_executable(helloworld_cli main.cpp)
@@ -61,11 +62,7 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     
     # Required variables for Bundle generator
     set(CPACK_BUNDLE_NAME "HelloWorld") 
-    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in")
-    set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns") # Optional icon file
-
-    # Configure Info.plist file
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist") # Ensure this path is correct
 
 endif()
 
