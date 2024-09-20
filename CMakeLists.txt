@@ -59,8 +59,11 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     
     # Required variables for Bundle generator
     set(CPACK_BUNDLE_NAME "HelloWorld") 
-    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist") # Ensure this path is correct
+    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in") # Use .in file instead of .plist
     set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns") # Optional icon file
+
+    # Configure Info.plist file
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 
 endif()
 
