@@ -26,6 +26,7 @@ jobs:
       
       - run: cmake --build . --target package
 
+      # Check if the release already exists
       - name: Check if release exists
         id: check_release_exists
         run: |
@@ -37,6 +38,7 @@ jobs:
             echo "release_exists=false" >> $GITHUB_ENV
           fi
 
+      # Create Release only if it does not exist
       - name: Create Release
         id: create_release
         if: env.release_exists == 'false'
@@ -49,6 +51,7 @@ jobs:
           draft: false
           prerelease: false 
 
+      # Upload Release Asset 
       - name: Upload Release Asset 
         id: upload-release-asset 
         if: env.release_exists == 'false'
@@ -80,17 +83,19 @@ jobs:
       
       - run: cmake --build . --target package
 
+      # Check if the release already exists for macOS 
       - name: Check if release exists for macOS 
         id: check_release_exists_macos 
         run: |
           TAG="release-${{ github.run_number }}-${{ github.sha }}"
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG")
           if [ "$RESPONSE" -eq 200 ]; then
-            echo "release_exists=true" >> $GITHUB_ENV
+            echo "release_exists=true" >> $GITHUB_ENV;
           else
-            echo "release_exists=false" >> $GITHUB_ENV
+            echo "release_exists=false" >> $GITHUB_ENV;
           fi
 
+      # Create Release for macOS only if it does not exist
       - name: Create Release for macOS
         id: create_release_macos
         if: env.release_exists == 'false'
@@ -103,6 +108,7 @@ jobs:
           draft: false
           prerelease: false 
 
+      # Upload Release Asset for macOS 
       - name: Upload Release Asset for macOS 
         id: upload-release-asset-macos 
         if: env.release_exists == 'false'
