@@ -83,8 +83,8 @@ jobs:
       
       - run: cmake --build . --target package
 
-      # Debugging step to list files
-      - name: List files
+      # Debugging step to list files after packaging for macOS
+      - name: List files after packaging for macOS
         run: |
           echo "Listing files in current directory:"
           ls -la
@@ -117,12 +117,13 @@ jobs:
       # Upload Release Asset for macOS 
       - name: Upload Release Asset for macOS 
         id: upload-release-asset-macos 
+        if: env.tag_exists == 'false'  # Ensure this runs only if the release does not exist
         
         uses: actions/upload-release-asset@v1  
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
         with:
           upload_url: ${{ steps.create_release_macos.outputs.upload_url }}  
-          asset_path: ./helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Path to the macOS package
-          asset_name: helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Name of the macOS package
+          asset_path: ./helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Path to the macOS package (ensure this path is correct)
+          asset_name: helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Name of the macOS package (ensure this matches)
           asset_content_type: application/octet-stream  # Content type for macOS packages
