@@ -124,6 +124,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
         with:
           upload_url: ${{ steps.create_release_macos.outputs.upload_url }}  
-          asset_path: ./helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Path to the macOS package (ensure this path is correct)
-          asset_name: helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Name of the macOS package (ensure this matches)
+          asset_path: ./helloworld-0.0.${{ github.run_number }}-macOS.zip  # Path to the macOS package (ensure this path is correct)
+          asset_name: helloworld-0.0.${{ github.run_number }}-macOS.zip  # Name of the macOS package (ensure this matches)
           asset_content_type: application/octet-stream  # Content type for macOS packages
