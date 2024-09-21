@@ -111,3 +111,30 @@ jobs:
           else
             echo "tag_exists=false" >> $GITHUB_ENV;
           fi
+
+        #Создает новую версию на GitHub, если существующий тег не был найден. Он использует create-release действие, предоставляя необходимые параметры, такие как имя тега, название выпуска и токен GitHub для аутентификации.
+      - name: Create Release
+        id: create_release
+        if: env.tag_exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "release-${{ github.run_number }}-${{ github.sha }}"
+          release_name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false 
+
+
+          # Upload Release Asset for macOS 
+      - name: Upload Release Asset for macOS 
+        id: upload-release-asset-macos 
+        if: env.release_exists == 'false'  # Ensure this runs only if the release does not exist
+        uses: actions/upload-release-asset@v1  
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+        with:
+          upload_url: ${{ steps.create_release_macos.outputs.upload_url }}  
+          asset_path: ./helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Path to the macOS package
+          asset_name: helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Name of the macOS package
+          asset_content_type: application/octet-stream  # Content type for macOS packages
