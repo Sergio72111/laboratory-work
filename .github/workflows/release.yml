@@ -13,7 +13,7 @@ jobs:
   build:  # Определение задачи сборки
     strategy:
       matrix:  # Использует матрицу для запуска на нескольких ОС
-        os: [TEST_FOR_UBUNTU, TEST_FOR_MACOC]  # Указывает, что задача будет выполняться на Ubuntu и macOS
+        os: [ubuntu-latest, macos-latest]  # Указывает, что задача будет выполняться на Ubuntu и macOS
     runs-on: ${{ matrix.os }}  # Запускает задачу на ОС, указанной в матрице
 
     steps:  # Шаги выполнения задачи
