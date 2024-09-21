@@ -8,19 +8,19 @@ on:
 
 jobs:
   build_FOR_UBUNTU:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     permissions: write-all
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           submodules: true
       # ... (rest of the Ubuntu build steps)
 
   build_FOR_MACOC:
-    runs-on: macos-latest
+    runs-on: macos-11
     permissions: write-all
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           submodules: true
       - run: brew update && brew install boost glfw glm || { echo 'Failed to install dependencies'; exit 1; }
