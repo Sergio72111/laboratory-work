@@ -26,15 +26,20 @@ jobs:
       
       - run: cmake --build . --target package
 
-      - name: Check if tag exists
-        id: check_tag_exists
+      - name: Check if release exists
+        id: check_release_exists
         run: |
           TAG="release-${{ github.run_number }}-${{ github.sha }}"
-          git tag -l | grep -q "$TAG" && echo "tag_exists=true" >> $GITHUB_ENV || echo "tag_exists=false" >> $GITHUB_ENV
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG")
+          if [ "$RESPONSE" -eq 200 ]; then
+            echo "release_exists=true" >> $GITHUB_ENV
+          else
+            echo "release_exists=false" >> $GITHUB_ENV
+          fi
 
       - name: Create Release
         id: create_release
-        if: env.tag_exists == 'false'
+        if: env.release_exists == 'false'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,7 +51,7 @@ jobs:
 
       - name: Upload Release Asset 
         id: upload-release-asset 
-        if: env.tag_exists == 'false'
+        if: env.release_exists == 'false'
         uses: actions/upload-release-asset@v1  
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
@@ -75,20 +80,20 @@ jobs:
       
       - run: cmake --build . --target package
 
-      - name: Check if tag exists for macOS 
-        id: check_tag_exists_macos 
+      - name: Check if release exists for macOS 
+        id: check_release_exists_macos 
         run: |
           TAG="release-${{ github.run_number }}-${{ github.sha }}"
-          if git tag -l | grep -q "$TAG"; then
-            echo "tag_exists=true" >> $GITHUB_ENV;
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG")
+          if [ "$RESPONSE" -eq 200 ]; then
+            echo "release_exists=true" >> $GITHUB_ENV
           else
-            echo "tag_exists=false" >> $GITHUB_ENV;
+            echo "release_exists=false" >> $GITHUB_ENV
           fi
 
-      # Создание релиза для macOS, аналогично Ubuntu
       - name: Create Release for macOS
         id: create_release_macos
-        if: env.tag_exists == 'false'
+        if: env.release_exists == 'false'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -98,10 +103,9 @@ jobs:
           draft: false
           prerelease: false 
 
-      # Загрузка артефакта для macOS
       - name: Upload Release Asset for macOS 
         id: upload-release-asset-macos 
-        if: env.tag_exists == 'false'
+        if: env.release_exists == 'false'
         uses: actions/upload-release-asset@v1  
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
