@@ -117,7 +117,7 @@ jobs:
       # Upload Release Asset for macOS 
       - name: Upload Release Asset for macOS 
         id: upload-release-asset-macos 
-        if: env.tag_exists == 'false'  # Ensure this runs only if the release does not exist
+        
         uses: actions/upload-release-asset@v1  
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
