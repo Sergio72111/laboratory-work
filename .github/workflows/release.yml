@@ -51,25 +51,26 @@ jobs:
       - name: Upload Release Asset for macOS
         id: upload-release-asset-macos
         if: env.tag_exists == 'false'
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-artifact@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release_macos.outputs.upload_url }}
-          asset_path: ./helloworld-0.0.${github.run_number}-macOS.pkg
-          asset_name: helloworld-0.0.${github.run_number}-macOS.pkg
-          asset_content_type: application/vnd.apple.installer+xml
+          name: helloworld-macOS.pkg
+          path: ./helloworld-0.0.${github.run_number}-macOS.pkg
+          retention_days: 30
       - name: Upload Source Code for macOS
         id: upload-source-code-macos
         if: env.tag_exists == 'false'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: helloworld-macOS-src
           path: ./src
+          retention_days: 30
       - name: Upload Source Code Archive for macOS
         id: upload-source-code-archive-macos
         if: env.tag_exists == 'false'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: helloworld-macOS-src.zip
           path: ./src.zip
+          retention_days: 30
