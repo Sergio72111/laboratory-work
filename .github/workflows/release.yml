@@ -1,5 +1,6 @@
 name: CI/CD
 
+#Запускает рабочий процесс по push событиям для указанных ветвей: main и feature/github_actions. Это означает, что любое нажатие на эти ветви инициирует процесс CI / CD.
 on:
   push:
     branches:
@@ -8,40 +9,47 @@ on:
 
 jobs:
   build_FOR_UBUNTU:
-    runs-on: ubuntu-latest
-    permissions: write-all
+    runs-on: ubuntu-latest #Определяет среду для задания, используя последнюю версию Ubuntu, доступную в GitHub Actions.
+    permissions: write-all #Устанавливает разрешения для задания, чтобы разрешить доступ на запись ко всем ресурсам. Это необходимо для создания выпусков и загрузки ресурсов.
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3 #Проверяет код репозитория в версии 3 действия проверки. Опция submodules: true гарантирует, что все подмодули также будут извлечены.
         with:
           submodules: true
       
+        #Обновляет списки пакетов и устанавливает необходимые зависимости (libboost-test-dev, libglfw3-dev, libglm-dev) с помощью apt-get. При сбое установки выводится сообщение об ошибке и завершается с ненулевым статусом.
       - run: |
           sudo apt-get update && sudo apt-get install -y libboost-test-dev libglfw3-dev libglm-dev || { echo 'Failed to install dependencies'; exit 1; }   
       
+          
+        #Запускает CMake для настройки системы сборки, передавая версию исправления, полученную на основе номера запуска на GitHub (уникальный идентификатор для каждого запуска).
       - run: cmake . -DPATCH_VERSION=${{ github.run_number }}
       
+      #Создает проект с помощью CMake на основе конфигурации, созданной на предыдущем шаге.
       - run: cmake --build .
       
+
+      #Запускает тесты, определенные в конфигурации CMake, чтобы убедиться, что встроенный код ведет себя так, как ожидалось.
       - run: cmake --build . --target test
       
+
+
+
+      #Упаковывает созданное приложение, создавая распространяемые файлы (например, .deb пакеты).
       - run: cmake --build . --target package
 
-      # Check if the release already exists
-      - name: Check if release exists
-        id: check_release_exists
+
+      #Проверяет, существует ли уже тег выпуска. Он создает имя тега на основе текущего номера запуска и SHA фиксации, затем проверяет его существование. Он устанавливает для переменной окружения tag_exists значение true или false.
+      - name: Check if tag exists
+        id: check_tag_exists
         run: |
           TAG="release-${{ github.run_number }}-${{ github.sha }}"
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG")
-          if [ "$RESPONSE" -eq 200 ]; then
-            echo "release_exists=true" >> $GITHUB_ENV
-          else
-            echo "release_exists=false" >> $GITHUB_ENV
-          fi
+          git tag -l | grep -q "$TAG" && echo "tag_exists=true" >> $GITHUB_ENV || echo "tag_exists=false" >> $GITHUB_ENV
 
-      # Create Release only if it does not exist
+
+        #Создает новую версию на GitHub, если существующий тег не был найден. Он использует create-release действие, предоставляя необходимые параметры, такие как имя тега, название выпуска и токен GitHub для аутентификации.
       - name: Create Release
         id: create_release
-        if: env.release_exists == 'false'
+        if: env.tag_exists == 'false'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,10 +59,11 @@ jobs:
           draft: false
           prerelease: false 
 
-      # Upload Release Asset 
+
+      #Загружает сгенерированный пакет в качестве ресурса для выпуска, если существующий тег не был найден. Он определяет такие детали, как путь к ресурсу, имя и тип контента, используя URL-адрес загрузки из предыдущего шага.
       - name: Upload Release Asset 
         id: upload-release-asset 
-        if: env.release_exists == 'false'
+        if: env.tag_exists == 'false'
         uses: actions/upload-release-asset@v1  
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
@@ -65,58 +74,40 @@ jobs:
           asset_content_type: application/vnd.debian.binary-package 
 
   build_FOR_MACOC:
-    runs-on: macos-latest
-    permissions: write-all
-    steps:
+    runs-on: macos-latest #Указывает, что это задание выполняется в последней версии macOS, доступной в GitHub Actions.
+    permissions: write-all #Устанавливает разрешения для этого задания, аналогичные заданию Ubuntu, разрешая доступ на запись ко всем ресурсам.
+    steps: #Начинается определение шагов для этого задания macOS.
+
+
+    #Проверяет код репозитория, как и в задании Ubuntu, обеспечивая включение подмодулей.
       - uses: actions/checkout@v3
         with:
           submodules: true
       
+
+        #Обновляет Homebrew и устанавливает необходимые зависимости (boost, glfw, glm) для macOS. При сбое установки выводится сообщение об ошибке и завершается с ненулевым статусом.
       - run: |
           brew update && brew install boost glfw glm || { echo 'Failed to install dependencies'; exit 1; }
       
+
+        #Запускает CMake для настройки системы сборки, аналогично тому, что было сделано в Ubuntu, передавая версию исправления, основанную на номере запуска на GitHub.
       - run: cmake . -DPATCH_VERSION=${{ github.run_number }}
       
-      - run: cmake --build .
+      - run: cmake --build . #Создает проект с использованием CMake, точно так же, как в задании Ubuntu.
       
-      - run: cmake --build . --target test
+      - run: cmake --build . --target test #Выполняет тесты, определенные в CMake, гарантируя, что после сборки все работает правильно.
       
-      - run: cmake --build . --target package
+      - run: cmake --build . --target package #Упаковывает созданное приложение, создавая распространяемые файлы (аналогично Ubuntu).
+      
 
-      # Check if the release already exists for macOS 
-      - name: Check if release exists for macOS 
-        id: check_release_exists_macos 
+
+      #Проверяет, существует ли уже тег выпуска для сборок macOS, следуя аналогичной логике, используемой в Ubuntu. Он устанавливает переменную окружения, указывающую, существует ли тег.
+      - name: Check if tag exists for macOS 
+        id: check_tag_exists_macos 
         run: |
           TAG="release-${{ github.run_number }}-${{ github.sha }}"
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG")
-          if [ "$RESPONSE" -eq 200 ]; then
-            echo "release_exists=true" >> $GITHUB_ENV;
+          if git tag -l | grep -q "$TAG"; then
+            echo "tag_exists=true" >> $GITHUB_ENV;
           else
-            echo "release_exists=false" >> $GITHUB_ENV;
+            echo "tag_exists=false" >> $GITHUB_ENV;
           fi
-
-      # Create Release for macOS only if it does not exist
-      - name: Create Release for macOS
-        id: create_release_macos
-        if: env.release_exists == 'false'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: "release-${{ github.run_number }}-${{ github.sha }}"
-          release_name: Release ${{ github.run_number }}
-          draft: false
-          prerelease: false 
-
-      # Upload Release Asset for macOS 
-      - name: Upload Release Asset for macOS 
-        id: upload-release-asset-macos 
-        if: env.release_exists == 'false'
-        uses: actions/upload-release-asset@v1  
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
-        with:
-          upload_url: ${{ steps.create_release_macos.outputs.upload_url }}  
-          asset_path: ./helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Укажите правильный путь к пакету для macOS.
-          asset_name: helloworld-0.0.${{ github.run_number }}-macOS.pkg  # Укажите имя файла для macOS.
-          asset_content_type: application/octet-stream  # Укажите правильный тип контента.
