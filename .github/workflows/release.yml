@@ -122,7 +122,10 @@ jobs:
 
           # Create the package file using your preferred method
           # For example, using a tool like `pkgbuild`
-          pkgbuild --root ./helloworld-0.0.${{ github.run_number }}-macOS ./helloworld-0.0.${{ github.run_number }}-macOS.pkg
+          pkgbuild --root ./helloworld-0.0.${{ github.run_number }}-macOS \
+                   --identifier com.example.helloworld \
+                   --component ./helloworld-0.0.${{ github.run_number }}-macOS \
+                   ./helloworld-0.0.${{ github.run_number }}-macOS.pkg
 
       # Upload Release Asset for macOS 
       - name: Upload Release Asset for macOS 
