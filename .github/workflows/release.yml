@@ -8,7 +8,7 @@ on:
 
 jobs:
   build_FOR_UBUNTU:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     permissions: write-all
     steps:
       - uses: actions/checkout@v2
@@ -17,7 +17,7 @@ jobs:
       # ... (rest of the Ubuntu build steps)
 
   build_FOR_MACOC:
-    runs-on: macos-11
+    runs-on: macos-latest
     permissions: write-all
     steps:
       - uses: actions/checkout@v2
